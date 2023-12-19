@@ -4,10 +4,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sub1_restaurant_app/service/restaurant.dart';
 import 'package:sub1_restaurant_app/utils.dart';
+
+import '../widget/grid_vew_cart.dart';
+import '../widget/list_view_cart.dart';
+import 'detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -121,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 height: MediaQuery.of(context).size.height / 8,
                               ),
                               Lottie.asset(
-                                'assets/image/cheff.json',
+                                'assets/image/header_food.json',
                                 width: MediaQuery.of(context).size.width / 3,
                                 height: MediaQuery.of(context).size.height / 8,
                               ),
@@ -173,107 +176,73 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                final restaurant = _restaurantList.restaurants[index];
-                return ListViewCart(restaurant: restaurant);
-              },
-              childCount: _restaurantList.restaurants.length,
-            ),
-          ),
+          _isGridViewCart
+              ? GridData(restaurants: _restaurantList.restaurants)
+              : ListData(restaurants: _restaurantList.restaurants),
         ],
       ),
     );
   }
 }
 
-class ListViewCart extends StatelessWidget {
-  final Restaurant restaurant;
+class ListData extends StatelessWidget {
+  final List<Restaurant> restaurants;
 
-  const ListViewCart({required this.restaurant, super.key});
+  const ListData({required this.restaurants, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: SizedBox(
-          height: 120,
-          child: Row(
-            children: [
-              Expanded(
-                flex: 10,
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(restaurant.pictureId),
-                      fit: BoxFit.fill,
-                    ),
-                  ),
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          final restaurant = restaurants[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailScreen(restaurant: restaurant),
                 ),
-              ),
-              const Spacer(
-                flex: 1,
-              ),
-              Expanded(
-                flex: 14,
-                child: Container(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      const SizedBox(height: 8),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          restaurant.name,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: <Widget>[
-                          const Icon(Icons.map, color: Colors.green),
-                          Text(
-                            restaurant.city,
-                            style: const TextStyle(fontSize: 14.0),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: <Widget>[
-                          const Icon(Icons.star, color: Colors.yellow),
-                          Text(
-                            '${restaurant.rating}',
-                            style: const TextStyle(fontSize: 14),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+              );
+            },
+            child: ListViewCart(restaurant: restaurant),
+          );
+        },
+        childCount: restaurants.length,
       ),
     );
   }
 }
 
-class GridViewCart extends StatelessWidget {
-  final Restaurant restaurant;
-  const GridViewCart({required this.restaurant, super.key});
+class GridData extends StatelessWidget {
+  final List<Restaurant> restaurants;
+
+  const GridData({required this.restaurants, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 5.0,
+        mainAxisSpacing: 5.0,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          final restaurant = restaurants[index];
+          return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailScreen(restaurant: restaurant),
+                  ),
+                );
+              },
+              child: GridViewCart(restaurant: restaurant));
+        },
+        childCount: restaurants.length,
+      ),
+    );
   }
 }

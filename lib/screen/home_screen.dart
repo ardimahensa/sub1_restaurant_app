@@ -5,12 +5,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
-import 'package:sub1_restaurant_app/service/restaurant.dart';
-import 'package:sub1_restaurant_app/utils.dart';
+import 'package:makan_bang/service/restaurant.dart';
+import 'package:makan_bang/utils.dart';
 
 import '../widget/grid_vew_cart.dart';
 import '../widget/list_view_cart.dart';
 import 'detail_screen.dart';
+import 'search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       String jsonString =
           await rootBundle.loadString('assets/json/local_restaurant.json');
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
+
       setState(() {
         _restaurantList = RestaurantList.fromJson(jsonData);
       });
@@ -57,8 +59,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handleScroll() {
     setState(() {
       _isScrolled = _scrollController.hasClients &&
-          _scrollController.offset > (200.0 - kToolbarHeight);
+          _scrollController.offset > (100.0 - kToolbarHeight);
     });
+  }
+
+  void _onSearchPressed() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SearchScreen()),
+    );
   }
 
   void _toggleView() {
@@ -74,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: _scrollController,
         slivers: [
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 250,
             floating: false,
             pinned: true,
             title: _isScrolled
@@ -98,16 +107,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           IconButton(
                             icon: Icon(
                                 _isGridViewCart ? Icons.list : Icons.grid_on,
-                                color: Colors.white),
+                                color: white),
                             onPressed: _toggleView,
                           ),
                         ],
                       ),
                     ),
                   ),
-            backgroundColor: _isScrolled ? greyDark : redDark,
+            backgroundColor: _isScrolled ? redDark : redLight,
             bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(10.0),
+              preferredSize: const Size.fromHeight(0),
               child: Container(
                 alignment: Alignment.center,
                 child: Column(
@@ -121,12 +130,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               Lottie.asset(
                                 'assets/image/sandwich.json',
                                 width: MediaQuery.of(context).size.width / 3,
-                                height: MediaQuery.of(context).size.height / 8,
+                                height: MediaQuery.of(context).size.height / 7,
                               ),
                               Lottie.asset(
                                 'assets/image/header_food.json',
                                 width: MediaQuery.of(context).size.width / 3,
-                                height: MediaQuery.of(context).size.height / 8,
+                                height: MediaQuery.of(context).size.height / 7,
                               ),
                             ],
                           ),
@@ -136,39 +145,36 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: MediaQuery.of(context).size.width * 0.8,
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       decoration: BoxDecoration(
-                        color: greylight,
+                        color: greyLight,
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color: greyDark,
-                          ),
-                          const SizedBox(width: 8.0),
-                          Expanded(
-                            child: TextField(
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 16.0,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: 'Cari yang kamu mau',
-                                labelStyle: const TextStyle(
+                      child: InkWell(
+                        onTap: _onSearchPressed,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(
+                              Icons.search,
+                              color: greyDark,
+                            ),
+                            const SizedBox(width: 8.0),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 2,
+                              child: Text(
+                                'Cari yang kamu mau',
+                                style: subTitleText.copyWith(
                                   fontSize: 12,
-                                ),
-                                hintStyle: TextStyle(
-                                  color: greylight,
+                                  color: black,
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8.0),
-                          const Icon(
-                            Icons.fastfood,
-                            color: Colors.red,
-                          ),
-                        ],
+                            const SizedBox(width: 8.0),
+                            Icon(
+                              Icons.fastfood,
+                              color: redDark,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

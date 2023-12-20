@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sub1_restaurant_app/service/restaurant.dart';
-import 'package:sub1_restaurant_app/utils.dart';
+import 'package:makan_bang/service/restaurant.dart';
+import 'package:makan_bang/utils.dart';
 
 class DetailScreen extends StatelessWidget {
   final Restaurant restaurant;
@@ -27,7 +27,7 @@ class DetailScreen extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                  color: Colors.grey, borderRadius: BorderRadius.circular(10)),
+                  color: greyDark, borderRadius: BorderRadius.circular(10)),
               child: Image.network(
                 restaurant.pictureId,
                 width: MediaQuery.of(context).size.width,
@@ -40,7 +40,7 @@ class DetailScreen extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                  color: greylight, borderRadius: BorderRadius.circular(10)),
+                  color: greyLight, borderRadius: BorderRadius.circular(10)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -54,28 +54,28 @@ class DetailScreen extends StatelessWidget {
                   const SizedBox(height: 8.0),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_city,
-                        color: Colors.green,
+                        color: green,
                       ),
                       const SizedBox(width: 5.0),
                       Text(
                         restaurant.city,
-                        style: const TextStyle(fontSize: 16.0),
+                        style: infoText.copyWith(fontSize: 16.0),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8.0),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.star,
-                        color: Colors.yellow,
+                        color: yellow,
                       ),
                       const SizedBox(width: 5.0),
                       Text(
                         "${restaurant.rating}",
-                        style: const TextStyle(fontSize: 16.0),
+                        style: infoText.copyWith(fontSize: 16.0),
                       ),
                     ],
                   ),
@@ -87,18 +87,18 @@ class DetailScreen extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                  color: greylight, borderRadius: BorderRadius.circular(10)),
+                  color: greyLight, borderRadius: BorderRadius.circular(10)),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     "Tentang Restorant Ini:",
-                    style:
-                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                    style: subTitleText.copyWith(
+                        fontSize: 18.0, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8.0),
                   Text(
                     restaurant.description,
-                    style: const TextStyle(fontSize: 16.0),
+                    style: subTitleText.copyWith(fontSize: 16.0),
                   ),
                 ],
               ),
@@ -106,20 +106,21 @@ class DetailScreen extends StatelessWidget {
             const Divider(
               thickness: 1,
             ),
-            const Text(
+            Text(
               "Menu Makanan:",
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              style: subTitleText.copyWith(
+                  fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
             Wrap(
               direction: Axis.horizontal,
-              spacing: 8.0, // Spasi antar item
-              runSpacing: 8.0, // Spasi antar baris jika melebihi lebar layar
+              spacing: 8.0,
+              runSpacing: 8.0,
               children: [
                 for (var food in restaurant.menus.foods)
                   Container(
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: greyLight,
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Text(food.name),
@@ -127,20 +128,21 @@ class DetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16.0),
-            const Text(
+            Text(
               "Menu Minuman:",
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              style: subTitleText.copyWith(
+                  fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
             Wrap(
               direction: Axis.horizontal,
-              spacing: 8.0, // Spasi antar item
-              runSpacing: 8.0, // Spasi antar baris jika melebihi lebar layar
+              spacing: 8.0,
+              runSpacing: 8.0,
               children: [
                 for (var drink in restaurant.menus.drinks)
                   Container(
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: greyLight,
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Text(drink.name),

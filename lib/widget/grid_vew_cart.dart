@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../service/restaurant.dart';
 import '../utils.dart';
@@ -37,16 +36,16 @@ class GridViewCart extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: greylight,
+                          color: greyLight,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: <Widget>[
-                            const Icon(Icons.star, color: Colors.yellow),
+                            Icon(Icons.star, color: yellow),
                             const SizedBox(width: 5.0),
                             Text(
                               '${restaurant.rating}',
-                              style: const TextStyle(fontSize: 14),
+                              style: infoText.copyWith(fontSize: 14),
                             )
                           ],
                         ),
@@ -55,37 +54,33 @@ class GridViewCart extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          restaurant.name,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
+              Container(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        restaurant.name,
+                        style: titleText.copyWith(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      Row(
-                        children: <Widget>[
-                          const Icon(Icons.location_city, color: Colors.green),
-                          const SizedBox(width: 5),
-                          Text(
-                            restaurant.city,
-                            style: const TextStyle(fontSize: 14.0),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: <Widget>[
+                        Icon(Icons.location_city, color: green),
+                        const SizedBox(width: 5),
+                        Text(
+                          restaurant.city,
+                          style: infoText.copyWith(fontSize: 14.0),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],

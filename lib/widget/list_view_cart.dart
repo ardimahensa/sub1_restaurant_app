@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../service/restaurant.dart';
+import '../utils.dart';
 
 class ListViewCart extends StatelessWidget {
   final Restaurant restaurant;
@@ -45,7 +45,7 @@ class ListViewCart extends StatelessWidget {
                         fit: BoxFit.scaleDown,
                         child: Text(
                           restaurant.name,
-                          style: GoogleFonts.montserrat(
+                          style: titleText.copyWith(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
                           ),
@@ -54,22 +54,22 @@ class ListViewCart extends StatelessWidget {
                       const SizedBox(height: 5),
                       Row(
                         children: <Widget>[
-                          const Icon(Icons.location_city, color: Colors.green),
+                          Icon(Icons.location_city, color: green),
                           const SizedBox(width: 5),
                           Text(
                             restaurant.city,
-                            style: const TextStyle(fontSize: 14.0),
+                            style: titleText.copyWith(fontSize: 14.0),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Row(
                         children: <Widget>[
-                          const Icon(Icons.star, color: Colors.yellow),
+                          Icon(Icons.star, color: yellow),
                           const SizedBox(width: 5),
                           Text(
                             '${restaurant.rating}',
-                            style: const TextStyle(fontSize: 14),
+                            style: infoText.copyWith(fontSize: 14),
                           )
                         ],
                       ),

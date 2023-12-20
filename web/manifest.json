@@ -1,6 +1,6 @@
 {
-    "name": "sub1_restaurant_app",
-    "short_name": "sub1_restaurant_app",
+    "name": "makan_bang",
+    "short_name": "makan_bang",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

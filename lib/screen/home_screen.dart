@@ -1,254 +1,222 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print
-
-import 'dart:convert';
-
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:lottie/lottie.dart';
-import 'package:makan_bang/service/restaurant.dart';
-import 'package:makan_bang/utils.dart';
+import 'package:get/get.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../widget/grid_vew_cart.dart';
-import '../widget/list_view_cart.dart';
-import 'detail_screen.dart';
-import 'search_screen.dart';
+import '../controller/restaurant_controller.dart';
+import '../shared/utils.dart';
+import '../widget/big_text.dart';
+import '../widget/icon_text.dart';
+import '../widget/small_text.dart';
+import '../widget/star_rating.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
 
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  late RestaurantList _restaurantList = RestaurantList(restaurants: []);
-  late ScrollController _scrollController;
-  bool _isScrolled = false;
-  bool _isGridViewCart = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_handleScroll);
-    _localApiRestaurant();
-  }
-
-  Future<void> _localApiRestaurant() async {
-    try {
-      String jsonString =
-          await rootBundle.loadString('assets/json/local_restaurant.json');
-      final Map<String, dynamic> jsonData = jsonDecode(jsonString);
-
-      setState(() {
-        _restaurantList = RestaurantList.fromJson(jsonData);
-      });
-    } catch (error) {
-      Center(
-        child: Lottie.asset('assets/image/cheff.json', height: 200, width: 200),
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _handleScroll() {
-    setState(() {
-      _isScrolled = _scrollController.hasClients &&
-          _scrollController.offset > (100.0 - kToolbarHeight);
-    });
-  }
-
-  void _onSearchPressed() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const SearchScreen()),
-    );
-  }
-
-  void _toggleView() {
-    setState(() {
-      _isGridViewCart = !_isGridViewCart;
-    });
-  }
+  final RestaurantController restaurantController =
+      Get.put(RestaurantController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 250,
-            floating: false,
-            pinned: true,
-            title: _isScrolled
-                ? null
-                : Center(
-                    child: SizedBox(
-                      height: kToolbarHeight,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(Icons.food_bank, color: white),
-                          Text(
-                            "MAKAN BANG",
-                            style: titleText.copyWith(
-                              fontSize: 24,
-                              color: white,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                                _isGridViewCart ? Icons.list : Icons.grid_on,
-                                color: white),
-                            onPressed: _toggleView,
-                          ),
-                        ],
+      body: Column(
+        children: [
+          appBar(),
+          const SizedBox(height: 15),
+          Expanded(
+            child: SingleChildScrollView(
+              child: topRestaurant(),
+            ),
+          ),
+          const SizedBox(height: 30),
+          indicator(),
+          const SizedBox(height: 30),
+          listRestaurants(),
+        ],
+      ),
+    );
+  }
+
+  Obx topRestaurant() {
+    return Obx(
+      () {
+        final topRatedRestaurants =
+            restaurantController.getTopRatedRestaurants();
+
+        return CarouselSlider.builder(
+          options: CarouselOptions(
+            height: 320.0,
+            enlargeCenterPage: true,
+            enableInfiniteScroll: false,
+            viewportFraction: 0.8,
+            aspectRatio: 2.0,
+            autoPlay: true,
+            onPageChanged: (index, reason) {
+              restaurantController.currentIndex.value = index;
+            },
+          ),
+          carouselController: restaurantController.carouselController,
+          itemCount: topRatedRestaurants.length,
+          itemBuilder: (BuildContext context, int index, int realIndex) {
+            final restaurant = topRatedRestaurants[index];
+            const urlImage =
+                'https://restaurant-api.dicoding.dev/images/medium';
+            return SizedBox(
+              height: 320,
+              child: Stack(
+                children: [
+                  //gambar dari api
+                  Container(
+                    height: 220,
+                    margin: const EdgeInsets.only(left: 10, right: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: Colors.blue,
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image:
+                            NetworkImage('$urlImage/${restaurant.pictureId}'),
                       ),
                     ),
                   ),
-            backgroundColor: _isScrolled ? redDark : redLight,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(0),
-              child: Container(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _isScrolled
-                        ? const SizedBox()
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Lottie.asset(
-                                'assets/image/sandwich.json',
-                                width: MediaQuery.of(context).size.width / 3,
-                                height: MediaQuery.of(context).size.height / 7,
-                              ),
-                              Lottie.asset(
-                                'assets/image/header_food.json',
-                                width: MediaQuery.of(context).size.width / 3,
-                                height: MediaQuery.of(context).size.height / 7,
-                              ),
-                            ],
-                          ),
-                    Container(
-                      margin: const EdgeInsets.all(5),
-                      height: MediaQuery.of(context).size.width / 9,
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  //top 5 restorant
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      height: 120,
+                      margin: const EdgeInsets.only(
+                          left: 15, right: 15, bottom: 20),
                       decoration: BoxDecoration(
-                        color: greyLight,
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(30),
+                        color: Colors.white,
                       ),
-                      child: InkWell(
-                        onTap: _onSearchPressed,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Container(
+                        padding:
+                            const EdgeInsets.only(top: 15, left: 10, right: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.search,
-                              color: greyDark,
-                            ),
-                            const SizedBox(width: 8.0),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width / 2,
-                              child: Text(
-                                'Cari yang kamu mau',
-                                style: subTitleText.copyWith(
-                                  fontSize: 12,
-                                  color: black,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8.0),
-                            Icon(
-                              Icons.fastfood,
-                              color: redDark,
+                            //nama restorant dari api
+                            Text(restaurant.name),
+                            const SizedBox(height: 10),
+
+                            StarRating(rating: restaurant.rating),
+
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                //asal kota restorant
+                                IconWithText(
+                                    text: restaurant.city,
+                                    iconColor: Colors.yellow,
+                                    icon: Icons.location_city),
+                                const SizedBox(width: 5),
+                                //jumlah makanan dari restorant
+                                const IconWithText(
+                                    text: 'Food',
+                                    iconColor: Colors.red,
+                                    icon: Icons.fastfood_outlined),
+                                const SizedBox(width: 5),
+                                //jumlah minuman dari restorant
+                                const IconWithText(
+                                    text: 'Drinks',
+                                    iconColor: Colors.red,
+                                    icon: Icons.local_drink_outlined),
+                              ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Obx indicator() {
+    return Obx(
+      () {
+        final topRatedRestaurants =
+            restaurantController.getTopRatedRestaurants();
+
+        return AnimatedSmoothIndicator(
+          activeIndex: restaurantController.currentIndex.value,
+          count: topRatedRestaurants.length,
+          effect: ExpandingDotsEffect(
+            dotColor: Utils.greyLight,
+            activeDotColor: Utils.mainColor,
+          ),
+          onDotClicked: (index) {
+            restaurantController.carouselController.animateToPage(index);
+          },
+        );
+      },
+    );
+  }
+
+  Container appBar() {
+    return Container(
+      margin: const EdgeInsets.only(top: 50, bottom: 15),
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            children: [
+              //nama app
+              BigText(
+                text: 'Makan Bang',
+                color: Utils.mainColor,
+              ),
+              //tagline
+              const SmallText(text: 'Gak Makan Gak Asik'),
+            ],
+          ),
+          //icon search
+          Center(
+            child: Container(
+              height: 45,
+              width: 45,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Utils.mainColor,
+              ),
+              child: const Icon(Icons.search, color: Colors.white),
             ),
           ),
-          _isGridViewCart
-              ? GridData(restaurants: _restaurantList.restaurants)
-              : ListData(restaurants: _restaurantList.restaurants),
         ],
       ),
     );
   }
-}
 
-class ListData extends StatelessWidget {
-  final List<Restaurant> restaurants;
-
-  const ListData({required this.restaurants, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          final restaurant = restaurants[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DetailScreen(restaurant: restaurant),
-                ),
+  Obx listRestaurants() {
+    return Obx(() {
+      if (restaurantController.isLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      } else {
+        return Expanded(
+          child: ListView.builder(
+            itemCount: restaurantController.restaurants.length,
+            itemBuilder: (context, index) {
+              final restaurant = restaurantController.restaurants[index];
+              return ListTile(
+                title: Text(restaurant.name),
+                subtitle: Text(restaurant.city),
+                // Tambahkan widget lain sesuai kebutuhan
               );
             },
-            child: ListViewCart(restaurant: restaurant),
-          );
-        },
-        childCount: restaurants.length,
-      ),
-    );
-  }
-}
-
-class GridData extends StatelessWidget {
-  final List<Restaurant> restaurants;
-
-  const GridData({required this.restaurants, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverGrid(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 5.0,
-        mainAxisSpacing: 5.0,
-      ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          final restaurant = restaurants[index];
-          return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailScreen(restaurant: restaurant),
-                  ),
-                );
-              },
-              child: GridViewCart(restaurant: restaurant));
-        },
-        childCount: restaurants.length,
-      ),
-    );
+          ),
+        );
+      }
+    });
   }
 }
